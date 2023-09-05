@@ -18,4 +18,8 @@ help: ## Display this help
 ##@ Build
 .PHONY: build
 build: ## Build the project locally
-	go build -o bin/mt.so -buildmode=plugin ./cmd/mtso.go
+	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64  go build -o bin/mt.so -buildmode=plugin ./cmd/mtso.go
+##@ Build
+.PHONY: build-linux
+build-linux: ## Build the project locally
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64  go build -o bin/mt.so -buildmode=plugin ./cmd/mtso.go

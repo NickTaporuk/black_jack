@@ -2,17 +2,11 @@ package main
 
 import "C"
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/seehuhn/mt19937"
 )
-
-//export SayHello
-func SayHello(name string) {
-	fmt.Println("Hello,", name)
-}
 
 // GenerateRandomTokens generates random tokens
 // rangeGen - amount of the tokens
