@@ -21,7 +21,8 @@ build: ## Build the project locally
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build -o bin/mt_darwin.so -buildmode=plugin ./cmd/mtso.go
 
 .PHONY: build-debug-mode
-build-debug-mode: ## Build the project locally
+build-debug-mode: ## this build will not be optimized to run just only debug mode, run dont work correctly
+	# https://github.com/golang/go/issues/27751
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build  -gcflags="all=-N -l" -o bin/mt_darwin_debug.so -buildmode=plugin ./cmd/mtso.go
 
 .PHONY: build-linux
