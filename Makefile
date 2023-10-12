@@ -20,6 +20,10 @@ help: ## Display this help
 build: ## Build the project locally
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build -o bin/mt_darwin.so -buildmode=plugin ./cmd/mtso.go
 
+.PHONY: build-debug-mode
+build-debug-mode: ## Build the project locally
+	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build  -gcflags="all=-N -l" -o bin/mt_darwin_debug.so -buildmode=plugin ./cmd/mtso.go
+
 .PHONY: build-linux
 build-linux: ## Build the project locally
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64  go build -o bin/mt_deb.so -buildmode=plugin ./cmd/mtso.go
