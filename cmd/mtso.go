@@ -11,12 +11,12 @@ import (
 // GenerateRandomTokens generates random tokens
 // rangeGen - amount of the tokens
 // tokensSlice - slice of the generated tokens
-func GenerateRandomTokens(rangeGen uint8) (tokensSlice []uint64) {
+func GenerateRandomTokens(rangeGen uint64) (tokensSlice []uint64) {
 	rng := mt19937.New()
 	// calculate the range from min to max by % from the cents
 	// generate x random tokens like a 100% of the range
 	tokensSlice = make([]uint64, rangeGen)
-	for i := uint8(0); i < rangeGen; i++ {
+	for i := uint64(0); i < rangeGen; i++ {
 		tokensSlice[i] = rng.Uint64()
 	}
 
@@ -41,8 +41,8 @@ func GetRandomNumber(tokensSlice []uint64) (randomNumber uint64) {
 	return randomNumber
 }
 
-// DropPersonalBonus drops the personal bonus
-func DropPersonalBonus(rangeGen uint8) bool {
+// DropBonus drops the personal bonus
+func DropBonus(rangeGen uint64) bool {
 	tokensSlice := GenerateRandomTokens(rangeGen)
 
 	randomNumber1 := GetRandomNumber(tokensSlice)
