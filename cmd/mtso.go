@@ -41,7 +41,10 @@ func GetRandomNumber(tokensSlice []uint64) (randomNumber uint64) {
 	return randomNumber
 }
 
-// DropBonus drops the personal bonus
+// DropBonus drops the bonus
+// rangeGen - amount of the tokens than tokens less than a drop is more close to a dropping
+// 100 tokens - 1% of the drop
+// 1 token - 100% of the drop
 func DropBonus(rangeGen uint64) bool {
 	tokensSlice := GenerateRandomTokens(rangeGen)
 
