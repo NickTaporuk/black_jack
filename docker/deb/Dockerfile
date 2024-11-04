@@ -1,5 +1,5 @@
 # Use the official Golang image as the base image
-FROM golang:1.20.6-bullseye
+FROM golang:1.23.2-bullseye
 
 # Set the current working directory in the container
 WORKDIR /app
