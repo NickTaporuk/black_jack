@@ -12,21 +12,21 @@
 # http://linuxcommand.org/lc3_adv_awk.php
 
 .PHONY: help
-help: ## Display this help
+help: ##  Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Build
 .PHONY: build
-build: ## Build the project locally
+build: ##  Build the project locally
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build -o bin/mt_darwin.so -buildmode=plugin ./cmd/mtso.go
 
 .PHONY: build-debug-mode
-build-debug-mode: ## this build will not be optimized to run just only debug mode, run dont work correctly
+build-debug-mode: ## This build will not be optimized to run just only debug mode
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build  -gcflags="all=-N -l" -o bin/mt_darwin_debug.so -buildmode=plugin ./cmd/mtso.go
 
 .PHONY: build-linux
-build-linux: ## Build the project locally
+build-linux: ##  Build the project locally
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64  go build -o bin/mt_deb.so -buildmode=plugin ./cmd/mtso.go
 
-build-docker-deb:
+build-docker-deb:  ## Build the project .so file for debian linux by docker
 	./scripts/generate_so_file.sh
