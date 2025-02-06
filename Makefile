@@ -1,3 +1,12 @@
+LUA_VERSION=5.4.7
+LUA_PATH=/opt/homebrew/Cellar/lua/$(LUA_VERSION)
+
+CC=gcc
+CFLAGS=-I$(LUA_PATH)/include/lua
+LDFLAGS=-L$(LUA_PATH)/lib -llua
+
+
+
 ##@ General
 
 # The help target prints out all targets with their descriptions organized
@@ -30,3 +39,16 @@ build-linux: ##  Build the project locally
 
 build-docker-deb:  ## Build the project .so file for debian linux by docker
 	./scripts/generate_so_file.sh
+
+build-lua-so-go:
+CGO_ENABLED=1 go build -o mtso_lua \
+    -gcflags "all=-N -l" \
+    -tags lua \
+    -ldflags "`pkg-config --libs lua5.4`" \
+    -cgo CFLAGS="`pkg-config --cflags lua5.4`" cmd/mtso_lua.go
+
+
+all: build-lua-so
+
+build-lua-so:
+	$(CC) -shared -o libjackpot.so jackpot.c $(CFLAGS) $(LDFLAGS) -fPIC
