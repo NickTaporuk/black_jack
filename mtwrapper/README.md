@@ -10,7 +10,7 @@ import (
 
 func main() {
     // Generate a random number
-    randomNum := jackpot.GenerateRandom(1, 100)
+    randomNum := mtwrapper.GenerateRandom(1, 100)
     fmt.Printf("Random Number: %d\n", randomNum)
 
     // Simulate jackpot drop
