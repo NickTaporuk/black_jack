@@ -5,7 +5,7 @@ package main
 
 import (
     "fmt"
-    "project/jackpot" // Import the jackpot package
+    "project/mtwrapper" // Import the jackpot package
 )
 
 func main() {
