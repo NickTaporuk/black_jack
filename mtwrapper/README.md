@@ -14,7 +14,7 @@ func main() {
     fmt.Printf("Random Number: %d\n", randomNum)
 
     // Simulate jackpot drop
-    if jackpot.DropJackpot(10000) {
+    if mtwrapper.DropJackpot(10000) {
         fmt.Println("🎉 Jackpot Dropped!")
     } else {
         fmt.Println("❌ No Jackpot This Time.")
