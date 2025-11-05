@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and install Golang 1.24.3
-RUN cd /tmp && wget https://golang.org/dl/go1.24.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.24.3.linux-amd64.tar.gz && \
-    rm /tmp/go1.24.3.linux-amd64.tar.gz
+# Download and install Golang 1.25.0
+RUN cd /tmp && wget https://golang.org/dl/go1.25.0.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.25.0.linux-amd64.tar.gz && \
+    rm /tmp/go1.25.0.linux-amd64.tar.gz
 
 # Set the environment variable for Go
 ENV PATH="/usr/local/go/bin:${PATH}"
