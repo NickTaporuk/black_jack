@@ -33,6 +33,11 @@ build: ##  Build the project locally
 build-debug-mode: ## This build will not be optimized to run just only debug mode
 	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64  go build  -gcflags="all=-N -l" -o bin/mt_darwin_debug.so -buildmode=plugin ./cmd/mtso.go
 
+.PHONY: build-debian-debug-mode
+build-debian-debug-mode: ## This build will not be optimized to run just only debug mode
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -gcflags="all=-N -l" -o bin/mt_linux_debug.so -buildmode=plugin ./cmd/mtso.go
+
+
 .PHONY: build-linux
 build-linux: ##  Build the project locally
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64  go build -o bin/mt_deb.so -buildmode=plugin ./cmd/mtso.go
