@@ -3,7 +3,7 @@
 package mtwrapper
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -lmtgenerator_macos
+#cgo LDFLAGS: -Wl,-rpath,"${SRCDIR}"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>

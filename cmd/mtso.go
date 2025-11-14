@@ -55,5 +55,3 @@ func DropBonus(rangeGen uint64) bool {
 	}
 	return false
 }
-
-// func main() {}
