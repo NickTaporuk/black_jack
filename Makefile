@@ -60,4 +60,5 @@ build-lua-so:
 
 .PHONY: build-debian-c++_so
 build-debian-c++_so: ## This is the building .so file from c++ to golang linux part
-	cd mtwrapper & g++ -std=c++17 -shared -fPIC -O3 -o libmtgenerator_linux.so mt_generator.cpp
+	cd mtwrapper && g++ -std=c++17 -shared -fPIC -O3 \
+		-o libmtgenerator_linux.so mt_generator.cpp
