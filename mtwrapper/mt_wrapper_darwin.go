@@ -4,15 +4,7 @@ package mtwrapper
 
 /*
 #cgo LDFLAGS: -Wl,-rpath,"${SRCDIR}"
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-// External C++ functions
-extern uint64_t* generate_random_tokens(uint64_t rangeGen);
-extern int get_random_index(uint64_t* tokens, uint64_t rangeGen);
-extern uint64_t get_random_number(uint64_t* tokens, uint64_t rangeGen);
-extern bool drop_bonus(uint64_t rangeGen);
+#include <mt_generator.h>
 */
 import "C"
 import "unsafe"
