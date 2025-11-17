@@ -57,3 +57,8 @@ all: build-lua-so
 
 build-lua-so:
 	$(CC) -shared -o libjackpot.so jackpot.c $(CFLAGS) $(LDFLAGS) -fPIC
+
+.PHONY: build-debian-c++_so
+build-debian-c++_so: ## This is the building .so file from c++ to golang linux part
+        cd mtwrapper & g++ -std=c++17 -shared -fPIC -O3 \
+    -o libmtgenerator_linux.so mt_generator.cpp
