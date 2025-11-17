@@ -1,0 +1,42 @@
+##############################################
+# Go CGO wrapper                             #
+##############################################
+
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+config_setting(
+    name = "on_linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "on_macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
+config_setting(
+    name = "on_windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+go_library(
+    name = "mtwrapper",
+    srcs = [
+        "mt_wrapper_linux.go",
+        "mt_wrapper_darwin.go",
+        "mt_wrapper_windows.go",
+        "mt_generator.h",
+        "mt_generator.cpp",
+    ],
+    cgo = True,
+    importpath = "gitlabce.champion.tm/champion-prj/mersenne-twister-shared-object/mtwrapper",
+
+    cdeps = select({
+        ":on_linux": [":lib_linux"],
+        ":on_macos": [":lib_macos"],
+        ":on_windows": [":lib_windows"],
+        "//conditions:default": [],
+    }),
+
+    visibility = ["//visibility:public"],
+)

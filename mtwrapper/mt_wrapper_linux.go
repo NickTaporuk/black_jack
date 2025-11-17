@@ -3,16 +3,9 @@
 package mtwrapper
 
 /*
-#cgo LDFLAGS: -L. -lmtgenerator_linux
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-// External C++ functions
-extern uint64_t* generate_random_tokens(uint64_t rangeGen);
-extern int get_random_index(uint64_t* tokens, uint64_t rangeGen);
-extern uint64_t get_random_number(uint64_t* tokens, uint64_t rangeGen);
-extern bool drop_bonus(uint64_t rangeGen);
+#cgo CFLAGS: -I${SRCDIR}
+#cgo LDFLAGS: -lmtgenerator_linux
+#include "mt_generator.h"
 */
 import "C"
 import "unsafe"
@@ -36,12 +29,10 @@ func GetRandomIndex(tokens []uint64) int {
 	return int(C.get_random_index((*C.uint64_t)(unsafe.Pointer(&tokens[0])), C.uint64_t(len(tokens))))
 }
 
-// GetRandomNumber wraps the C++ function to get a random number
 func GetRandomNumber(tokens []uint64) uint64 {
 	return uint64(C.get_random_number((*C.uint64_t)(unsafe.Pointer(&tokens[0])), C.uint64_t(len(tokens))))
 }
 
-// DropBonus wraps the C++ function to determine if a bonus should drop
 func DropBonus(rangeGen uint64) bool {
 	return bool(C.drop_bonus(C.uint64_t(rangeGen)))
 }
