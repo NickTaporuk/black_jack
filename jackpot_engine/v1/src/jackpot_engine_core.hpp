@@ -88,45 +88,6 @@ static uint64_t calculate_drop_point(const JackpotConfig& cfg, IRng& rng) {
 // ===============================
 // Jackpot check
 // ===============================
-/*static bool jackpot_check(JackpotState& st, IRng& rng) {
-    if (!st.active || st.dropPoint == 0) return false;
-    if (st.counter >= st.dropPoint) return true;
-
-    uint64_t chance = volatility_curve_fixed(
-        st.counter,
-        st.dropPoint,
-        st.cfg.volatility
-    );
-
-    if (chance == 0) return false;
-    if (chance >= 10000) return true;
-
-    uint64_t rand_next = (rng.next_u64() % 10000);
-    return rand_next < chance;
-}
-
-static bool jackpot_check(JackpotState& st, IRng& rng) {
-    if (!st.active || st.dropPoint == 0) return false;
-    if (st.counter >= st.dropPoint) return true;
-
-    uint64_t chance = volatility_curve_fixed(
-        st.counter,
-        st.dropPoint,
-        st.cfg.volatility
-    );
-
-    if (chance == 0) return false;
-    if (chance >= 10000) return true;
-
-    // float probability model
-    double probability = (double)chance / 10000.0;
-
-    // uniform 0..1
-    double u = (double)rng.next_u64() / (double)UINT64_MAX;
-
-    return u < probability;
-}*/
-
 static bool jackpot_check(JackpotState& st, IRng& rng) {
     if (!st.active || st.dropPoint == 0)
         return false;

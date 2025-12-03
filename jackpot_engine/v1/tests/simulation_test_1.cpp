@@ -40,7 +40,7 @@ int main() {
         }
 
         if (hit == 1) {
-            std::cout << "\n🎉 JACKPOT HIT after " << iterations << " iterations\n";
+            std::cout << "\n JACKPOT HIT after " << iterations << " iterations\n";
             std::cout << "New dropPoint=" << jackpot_get_drop_point(eng, id) << "\n";
             break;
         }

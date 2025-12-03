@@ -75,3 +75,27 @@ test_simulation:
 	@cd v1/tests && ./simulation_test_1
 
 .PHONY: test_simulation
+# Test simulation target
+test_jackpot_stats:
+	$(CXX) $(CXXFLAGS) \
+		-Iv1/src \
+		-I$(JSON_INCLUDE) \
+		$(NO_FAST_MATH) \
+		v1/tests/jackpot_stats.cpp \
+		-o v1/tests/jackpot_stats
+
+	@echo "Run simulation..."
+	@cd v1/tests && ./jackpot_stats
+
+.PHONY: test_simulation
+
+test_simulation_1:
+	$(CXX) -std=c++20 -O3 -DNDEBUG -flto=auto \
+			-Wall -Wextra -Werror -fPIC -march=native -mtune=native \
+			-Iv1/src -I/opt/homebrew/include \
+			v1/tests/simulation_test.cpp v1/src/jackpot_engine_v1.cpp \
+			-o v1/tests/simulation_test
+		@echo "=== Running 100M bet certification simulation ==="
+		@v1/tests/simulation_test
+
+.PHONY: test_simulation_1
