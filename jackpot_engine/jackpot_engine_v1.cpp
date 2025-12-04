@@ -3,6 +3,11 @@
 
 extern "C" {
 
+const char* jackpot_engine_version() {
+    static const char* version = "v.0.0.2";
+    return version;
+}
+
 struct JackpotEngineHandle {
     JackpotEngine* engine;
 };

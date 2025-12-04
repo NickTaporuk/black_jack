@@ -31,6 +31,8 @@ size_t   jackpot_count(JackpotEngineHandle* h);
 
 void jackpot_engine_destroy(JackpotEngineHandle* h);
 
+const char* jackpot_engine_version();
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,11 +1,11 @@
 # jackpot_engine/Makefile
 CXX      := c++
 
-SRC      := v1/src/jackpot_engine_v1.cpp
-CORE     := v1/src/jackpot_engine_core.hpp
-HDR      := v1/src/jackpot_engine_v1.h
+SRC      := jackpot_engine_v1.cpp
+CORE     := jackpot_engine_core.hpp
+HDR      := jackpot_engine_v1.h
 
-LIBDIR   := v1/lib
+LIBDIR   := ./
 # macOS Homebrew JSON include path
 JSON_INCLUDE := $(shell brew --prefix nlohmann-json)/include
 
@@ -17,13 +17,14 @@ NO_FAST_MATH := -fno-fast-math -fno-finite-math-only
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
 
+
+# Default target
+all: $(LIBDIR)/libjackpot_engine_v1_linux.so $(LIBDIR)/libjackpot_engine_v1_macos.dylib
+
 init:
 	@echo "Building for $(UNAME_S) on $(UNAME_M)..."
 	brew install nlohmann-json # For macOS users; on Linux use your package manager
 	# sudo apt install nlohmann-json3-dev # For Debian/Ubuntu users
-
-# Default target
-all: $(LIBDIR)/libjackpot_engine_v1_linux.so $(LIBDIR)/libjackpot_engine_v1_macos.dylib
 
 # Linux shared library
 $(LIBDIR)/libjackpot_engine_v1_linux.so: $(SRC) | $(LIBDIR)

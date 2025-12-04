@@ -28,6 +28,7 @@ all: build
 # Build the shared library and Go binary
 build:
 	g++ $(LDFLAGS) -o $(LIBRARY) mt_generator.cpp $(CFLAGS)
+	#g++ -dynamiclib -o libmtgenerator_macos.dylib mt_generator.cpp -fPIC
 	CGO_ENABLED=1 GOOS=$(OS) GOARCH=$(ARCH) $(CGO_FLAGS) go build -o $(BINARY) mt_wrapper_darwin.go
 
 # Run the application

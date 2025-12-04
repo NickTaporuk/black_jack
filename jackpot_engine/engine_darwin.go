@@ -1,20 +1,19 @@
+//go:build darwin
+
 package jackpot_engine
 
 /*
-#cgo CFLAGS: -Iv1/src
-#cgo LDFLAGS: -L${SRCDIR}/v1/lib -ljackpot_engine_v1_linux
-#cgo LDFLAGS: -L${SRCDIR}/v1/lib -ljackpot_engine_v1_macos
+#cgo LDFLAGS: -Wl,-rpath,"${SRCDIR}"
 
-#include "jackpot_engine.h"
+#include "jackpot_engine_v1.h"
 */
 import "C"
 
 import (
-    "context"
-    "fmt"
-    "sync"
-    "sync/atomic"
-    "unsafe"
+	"fmt"
+	"sync"
+	"sync/atomic"
+	"unsafe"
 )
 
 // Volatility mirrors C++ enum
@@ -26,17 +25,29 @@ const (
 	VolatilityHigh   Volatility = 3
 )
 
+var VolatilityName = map[string]Volatility{
+	"low":    VolatilityLow,
+	"medium": VolatilityMedium,
+	"high":   VolatilityHigh,
+}
+
+var VolatilityIntToName = map[Volatility]string{
+	VolatilityLow:    "low",
+	VolatilityMedium: "medium",
+	VolatilityHigh:   "high",
+}
+
 type Config struct {
-	MinPoint    uint64
-	MaxPoint    uint64
-	Volatility  Volatility
+	MinPoint   uint64
+	MaxPoint   uint64
+	Volatility Volatility
 }
 
 // Engine is safe for concurrent use from thousands of goroutines
 type Engine struct {
 	handle unsafe.Pointer // *C.JackpotEngineHandle
-	closed uint64          // atomic
-	mu     sync.Mutex      // protects destroy sequence
+	closed uint64         // atomic
+	mu     sync.Mutex     // protects destroy sequence
 }
 
 // New creates a fully deterministic engine from seed.
@@ -66,53 +77,13 @@ func (e *Engine) AddJackpot(cfg Config) (int, error) {
 	return int(id), nil
 }
 
-// Process advances one or more jackpots in a single atomic step.
-// Returns slice of jackpot IDs that dropped this step.
-func (e *Engine) Process(ctx context.Context, increments map[int]uint64) ([]int, error) {
-	if atomic.LoadUint64(&e.closed) == 1 {
-		return nil, fmt.Errorf("engine already destroyed")
-	}
-
-	// Fast path: single increment (most common)
-	if len(increments) == 1 {
-		for id, amt := range increments {
-			ok := C.jackpot_process((*C.JackpotEngineHandle)(e.handle),
-				C.int(id), C.uint64_t(amt))
-			if ok != 0 {
-				return []int{id}, nil
-			}
-			return nil, nil
-		}
-	}
-
-	// General path – lock once, process all
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	var dropped []int
-	for id, amt := range increments {
-		select {
-		case <-ctx.Done():
-			return dropped, ctx.Err()
-		default:
-		}
-
-		ok := C.jackpot_process((*C.JackpotEngineHandle)(e.handle),
-			C.int(id), C.uint64_t(amt))
-		if ok != 0 {
-			dropped = append(dropped, id)
-		}
-	}
-	return dropped, nil
-}
-
 // ProcessOne convenience single-jackpot version used 99% of the time
-func (e *Engine) ProcessOne(id int, amount uint64) (bool, error) {
+func (e *Engine) ProcessOne(id int, step uint64) (bool, error) {
 	if atomic.LoadUint64(&e.closed) == 1 {
 		return false, fmt.Errorf("engine already destroyed")
 	}
 	ok := C.jackpot_process((*C.JackpotEngineHandle)(e.handle),
-		C.int(id), C.uint64_t(amount))
+		C.int(id), C.uint64_t(step))
 	return ok != 0, nil
 }
 
@@ -130,4 +101,30 @@ func (e *Engine) Close() error {
 		e.handle = nil
 	}
 	return nil
+}
+
+// GetDropPoint returns the drop point for the given jackpot ID
+func (e *Engine) GetDropPoint(id int) (uint64, error) {
+	if atomic.LoadUint64(&e.closed) == 1 {
+		return 0, fmt.Errorf("engine already destroyed")
+	}
+
+	dp := C.jackpot_get_drop_point(
+		(*C.JackpotEngineHandle)(e.handle),
+		C.int(id),
+	)
+
+	return uint64(dp), nil
+}
+
+// Version returns the engine version string
+func (e *Engine) Version() (string, error) {
+    if atomic.LoadUint64(&e.closed) == 1 {
+        return "", fmt.Errorf("engine closed")
+    }
+    cstr := C.jackpot_engine_version()
+    if cstr == nil {
+        return "", fmt.Errorf("version not available")
+    }
+    return C.GoString(cstr), nil
 }
