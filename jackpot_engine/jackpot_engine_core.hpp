@@ -39,15 +39,15 @@ struct JackpotState {
     bool active;
 };
 
-/*
 static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Volatility vol) {
     if (counter >= dropPoint) return 10000;
     if (counter == 0) return 0;
 
     long double x = (long double)counter / (long double)dropPoint;
-    long double prob = 0;
+    long double prob = 0.0L;
 
     switch (vol) {
+
         case Volatility::Low:
             prob = x;
             break;
@@ -57,7 +57,7 @@ static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Vol
             break;
 
         case Volatility::High:
-            prob = x * x * x;  // Normal cubic curve
+            prob = 1.0L / (1.0L + expl(-12.0L * (x - 0.75L)));
             break;
 
         default:
@@ -65,62 +65,11 @@ static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Vol
             break;
     }
 
-    auto result = static_cast<uint64_t>(prob * 10000.0L);
-    if (result > 10000) result = 10000;
-    return result;
+    uint64_t out = (uint64_t)(prob * 10000.0L);
+    if (out > 10000) out = 10000;
+    return out;
 }
-*/
 
-// === ИДЕАЛЬНАЯ ВОЛАТИЛЬНОСТЬ 2025 — КАК У ARISTOCRAT, IGT, PLAYTECH ===
-static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Volatility vol)
-{
-    if (counter >= dropPoint) return 10000;
-    if (counter == 0) return 0;
-
-    long double x = (long double)counter / (long double)dropPoint;  // 0.0 .. 1.0
-
-    long double p = 0.0L;
-
-    switch (vol) {
-        case Volatility::Low:
-            // Линейная — ровные выпадения
-            p = x;
-            break;
-
-        case Volatility::Medium:
-            // Классическая квадратная — плавный рост
-            p = x * x;                    // x² — идеально для Medium
-            break;
-
-        case Volatility::High:
-            // ЭТО ТО, ЧТО ТЫ ХОЧЕШЬ — ЗЕЛЁНАЯ КРИВАЯ С ВЗРЫВОМ В КОНЦЕ
-            // Полином 5-й степени (Бе́зье), используется всеми топ-провайдерами
-            // p(x) = 10x⁵ - 15x⁴ + 6x³
-            // При x=0.0 → 0%
-            // При x=0.8 → ~20%
-            // При x=0.9 → ~59%
-            // При x=0.95 → ~81%
-            // При x=1.0 → 100%
-        {
-            long double x2 = x * x;
-            long double x3 = x2 * x;
-            long double x4 = x3 * x;
-            long double x5 = x4 * x;
-            p = 10.0L * x5 - 15.0L * x4 + 6.0L * x3;
-        }
-            break;
-
-        default:
-            p = x;
-            break;
-    }
-
-    // Защита от переполнения
-    if (p > 1.0L) p = 1.0L;
-    if (p < 0.0L) p = 0.0L;
-
-    return (uint64_t)(p * 10000.0L);
-}
 // ===============================
 // Drop point calculation
 // ===============================
@@ -137,44 +86,25 @@ static uint64_t calculate_drop_point(const JackpotConfig& cfg, IRng& rng) {
     return cfg.minPoint + (r % mod);
 }
 
-// ===============================
-// Jackpot check
-// ===============================
+//
 static bool jackpot_check(JackpotState& st, IRng& rng) {
-    if (!st.active || st.dropPoint == 0)
-        return false;
+    if (!st.active || st.counter < st.cfg.minPoint) return false;
 
-    if (st.counter < st.cfg.minPoint)
-        return false;
+    uint64_t passed     = st.counter - st.cfg.minPoint;
+    uint64_t total_span = st.dropPoint - st.cfg.minPoint;
 
-    uint64_t effectiveCounter;
-    uint64_t effectiveSpan;
+    if (passed >= total_span) return true;
 
-    if (st.dropPoint <= st.cfg.minPoint) {
-        effectiveCounter = st.counter - st.cfg.minPoint;
-        effectiveSpan    = 1;
-    } else {
-        effectiveCounter = st.counter - st.cfg.minPoint;
-        effectiveSpan    = st.dropPoint - st.cfg.minPoint;
-    }
+    long double progress = (long double)passed / (long double)total_span;
 
-    if (effectiveCounter >= effectiveSpan)
-        return true;
+	long double p = progress * progress * progress;
+	constexpr uint64_t PRECISION = 100'000'000ULL;
+    uint64_t chance = (uint64_t)(p * (long double)PRECISION);
+    uint64_t roll   = rng.next_u64() % PRECISION;
 
-    uint64_t chance = volatility_curve_fixed(
-        effectiveCounter,
-        effectiveSpan,
-        st.cfg.volatility
-    );
-
-    if (chance == 0)
-        return false;
-    if (chance >= 10000)
-        return true;
-
-    uint64_t rand_next = rng.next_u64() % 10000;
-    return rand_next < chance;
+    return roll < chance;
 }
+
 // ===============================
 // JackpotEngine class
 // ===============================

@@ -1,5 +1,0 @@
-Certification simulation completed successfully
-Total bets processed: 100000000
-Execution time: 5.88813 seconds
-Processing speed: 16983309 bets/second
-Total jackpot hits: 7159445

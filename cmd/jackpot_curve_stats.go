@@ -34,16 +34,16 @@ type FullReport struct {
 
 func main() {
 	intervals := []Interval{
-		{10000, 12000},
+		// 		{10000, 12000},
 		//{6600, 9800},
 		//{36700, 45000},
-// 		{265000, 310000},
+		{265000, 310000},
 	}
 
-	const runsPerPoint = 5000
+	const runsPerPoint = 500
 	const step = 1
 	vol := jackpot_engine.VolatilityHigh
-	//vol := jackpot_engine.VolatilityMedium
+	// 	vol := jackpot_engine.VolatilityMedium
 	//vol := jackpot_engine.VolatilityLow
 
 	report := FullReport{
@@ -60,16 +60,11 @@ func main() {
 
 		for dp := iv.Min; dp <= iv.Max; dp++ {
 			var total uint64
-			seed := jackpot_engine.DeterministicSeed(uint64(dp))
+			seed := jackpot_engine.DeterministicSeed(uint64(1111))
 			eng, err := jackpot_engine.New(seed)
 			if err != nil {
 				panic(err)
 			}
-            vers, err := eng.Version()
-            if err != nil {
-                panic(err)
-            }
-            fmt.Println("VERSION==", vers)
 
 			cfg := jackpot_engine.Config{
 				MinPoint:   dp,
@@ -125,5 +120,5 @@ func main() {
 	enc.SetIndent("", "    ")
 	enc.Encode(report)
 
-	fmt.Println("Saved jackpot_curve_stats.json")
+	fmt.Printf("Saved %s\n", filePath)
 }

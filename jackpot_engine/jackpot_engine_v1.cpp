@@ -4,7 +4,7 @@
 extern "C" {
 
 const char* jackpot_engine_version() {
-    static const char* version = "v.0.0.2";
+    static const char* version = "v.0.1.4"; // version is a static version
     return version;
 }
 

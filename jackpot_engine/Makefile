@@ -100,3 +100,12 @@ test_simulation_1:
 		@v1/tests/simulation_test
 
 .PHONY: test_simulation_1
+
+test_drop_curve:
+	$(CXX) -std=c++20 -O3 -I./ -I/opt/homebrew/include \
+		tests/drop_curve_test.cpp jackpot_engine_v1.cpp \
+		-o tests/drop_curve_test
+	@echo "=== Запуск теста кубической кривой ==="
+	@tests/drop_curve_test
+
+.PHONY: test_drop_curve
