@@ -39,15 +39,15 @@ struct JackpotState {
     bool active;
 };
 
+
 static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Volatility vol) {
     if (counter >= dropPoint) return 10000;
     if (counter == 0) return 0;
 
     long double x = (long double)counter / (long double)dropPoint;
-    long double prob = 0.0L;
+    long double prob = 0;
 
     switch (vol) {
-
         case Volatility::Low:
             prob = x;
             break;
@@ -57,7 +57,7 @@ static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Vol
             break;
 
         case Volatility::High:
-            prob = 1.0L / (1.0L + expl(-12.0L * (x - 0.75L)));
+            prob = x * x * x;
             break;
 
         default:
@@ -65,9 +65,9 @@ static uint64_t volatility_curve_fixed(uint64_t counter, uint64_t dropPoint, Vol
             break;
     }
 
-    uint64_t out = (uint64_t)(prob * 10000.0L);
-    if (out > 10000) out = 10000;
-    return out;
+    auto result = static_cast<uint64_t>(prob * 10000.0L);
+    if (result > 10000) result = 10000;
+    return result;
 }
 
 // ===============================
@@ -88,21 +88,39 @@ static uint64_t calculate_drop_point(const JackpotConfig& cfg, IRng& rng) {
 
 //
 static bool jackpot_check(JackpotState& st, IRng& rng) {
-    if (!st.active || st.counter < st.cfg.minPoint) return false;
+    if (!st.active || st.dropPoint == 0)
+        return false;
 
-    uint64_t passed     = st.counter - st.cfg.minPoint;
-    uint64_t total_span = st.dropPoint - st.cfg.minPoint;
+    if (st.counter < st.cfg.minPoint)
+        return false;
 
-    if (passed >= total_span) return true;
+    uint64_t effectiveCounter;
+    uint64_t effectiveSpan;
 
-    long double progress = (long double)passed / (long double)total_span;
+    if (st.dropPoint <= st.cfg.minPoint) {
+        effectiveCounter = st.counter - st.cfg.minPoint;
+        effectiveSpan    = 1;
+    } else {
+        effectiveCounter = st.counter - st.cfg.minPoint;
+        effectiveSpan    = st.dropPoint - st.cfg.minPoint;
+    }
 
-	long double p = progress * progress * progress;
-	constexpr uint64_t PRECISION = 100'000'000ULL;
-    uint64_t chance = (uint64_t)(p * (long double)PRECISION);
-    uint64_t roll   = rng.next_u64() % PRECISION;
+    if (effectiveCounter >= effectiveSpan)
+        return true;
 
-    return roll < chance;
+    uint64_t chance = volatility_curve_fixed(
+        effectiveCounter,
+        effectiveSpan,
+        st.cfg.volatility
+    );
+
+    if (chance == 0)
+        return false;
+    if (chance >= 10000)
+        return true;
+
+    uint64_t rand_next = rng.next_u64() % 10000;
+    return rand_next < chance;
 }
 
 // ===============================
