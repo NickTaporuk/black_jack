@@ -41,7 +41,7 @@ func main() {
 	}
 
 	const runsPerPoint = 500
-	const step = 1
+	const step = 50
 	vol := jackpot_engine.VolatilityHigh
 	// 	vol := jackpot_engine.VolatilityMedium
 	//vol := jackpot_engine.VolatilityLow
