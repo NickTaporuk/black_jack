@@ -3,7 +3,7 @@
 package jackpot_engine
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -ljackpot_engine_linux
+#cgo LDFLAGS: -L${SRCDIR} -ljackpot_engine_v1_linux
 
 #include "jackpot_engine_v1.h"
 */
