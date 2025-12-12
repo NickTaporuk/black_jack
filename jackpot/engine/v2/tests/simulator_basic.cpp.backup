@@ -1,0 +1,64 @@
+#include "jackpot_engine.hpp"
+#include <iostream>
+
+
+// =====================
+// CLI helpers
+// =====================
+uint64_t get_flag(
+    const std::unordered_map<std::string, std::string>& args,
+    const std::string& name,
+    uint64_t def
+) {
+    auto it = args.find(name);
+    if (it == args.end()) return def;
+    try {
+        return std::stoull(it->second);
+    } catch (...) {
+        return def;
+    }
+}
+
+int main(int argc, char** argv) {
+    std::unordered_map<std::string, std::string> args;
+    for (int i = 1; i + 1 < argc; i += 2) {
+        args[argv[i]] = argv[i + 1];
+    }
+
+    uint64_t minP   = get_flag(args, "--min",    1'000'000);
+    uint64_t maxP   = get_flag(args, "--max",    2'000'000);
+    uint64_t trials = get_flag(args, "--trials", 1'000'000);
+
+    bool seed_provided = args.count("--seed");
+    uint64_t seed = seed_provided
+        ? get_flag(args, "--seed", 0)
+        : (uint64_t)std::chrono::high_resolution_clock::now()
+              .time_since_epoch().count();
+
+    if (minP >= maxP) {
+        std::cerr << "ERROR: --min must be < --max\n";
+        return 1;
+    }
+
+    // Header (audit-friendly)
+    std::cout << "===== Jackpot Simulation =====\n";
+    std::cout << "min     = " << minP   << "\n";
+    std::cout << "max     = " << maxP   << "\n";
+    std::cout << "trials  = " << trials << "\n";
+    std::cout << "seed    = " << seed
+              << (seed_provided ? " (fixed)\n" : " (auto)\n");
+    std::cout << "engine  = sample-once uniform drop\n";
+    std::cout << "==============================\n\n";
+
+    JackpotEngine engine(123456); // fixed seed
+
+    engine.init({1'000'000, 2'000'000});
+
+    while (true) {
+        if (engine.process(1)) {
+            std::cout << "JACKPOT DROP at counter = "
+                      << engine.counter() << "\n";
+            break;
+        }
+    }
+}
