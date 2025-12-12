@@ -1,8 +1,9 @@
+//go:build darwin
+
 package v2
 
 /*
-#cgo  darwin LDFLAGS: -Wl,-rpath,"${SRCDIR}"
-#cgo  linux LDFLAGS: -L${SRCDIR}"
+#cgo LDFLAGS: -Wl,-rpath,"${SRCDIR}"
 
 #include <stdint.h>
 #include "jackpot_c_api.h"
