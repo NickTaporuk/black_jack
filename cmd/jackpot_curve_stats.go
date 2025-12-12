@@ -34,16 +34,16 @@ type FullReport struct {
 
 func main() {
 	intervals := []Interval{
-		// 		{10000, 12000},
+		{10000, 12000},
 		//{6600, 9800},
 		//{36700, 45000},
-		{265000, 310000},
+		//{265000, 310000},
 	}
 
 	const runsPerPoint = 500
-	const step = 50
+	const step = 1
 	vol := jackpot_engine.VolatilityHigh
-	// 	vol := jackpot_engine.VolatilityMedium
+	//vol := jackpot_engine.VolatilityMedium
 	//vol := jackpot_engine.VolatilityLow
 
 	report := FullReport{
@@ -60,7 +60,7 @@ func main() {
 
 		for dp := iv.Min; dp <= iv.Max; dp++ {
 			var total uint64
-			seed := jackpot_engine.DeterministicSeed(uint64(1111))
+			seed := jackpot_engine.DeterministicSeed(uint64(time.Now().UnixNano()))
 			eng, err := jackpot_engine.New(seed)
 			if err != nil {
 				panic(err)
