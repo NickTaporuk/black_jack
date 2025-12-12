@@ -3,7 +3,7 @@
 package v2
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -llibjackpot
+#cgo LDFLAGS: -L${SRCDIR} -ljackpot
 
 #include <stdint.h>
 #include "jackpot_c_api.h"
